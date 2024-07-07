@@ -1,10 +1,10 @@
 use plotpy::{Curve, Plot};
-use rand::{Rng, thread_rng};
+use rand::{thread_rng, Rng};
 
-use simple_qp::{constraint, Float};
 use simple_qp::problem::Problem;
 use simple_qp::solver::clarabel_solver::ClarabelSolver;
 use simple_qp::solver::osqp_solver::OSQPSolver;
+use simple_qp::{constraint, Float};
 
 fn smooth_path(points: Vec<[Float; 2]>, max_deviation: Float) -> Vec<[Float; 2]> {
     let mut prob = Problem::default();
@@ -24,17 +24,19 @@ fn smooth_path(points: Vec<[Float; 2]>, max_deviation: Float) -> Vec<[Float; 2]>
             .push(constraint!(-max_deviation <= ys[i] - p[1] <= max_deviation));
     }
 
-    let n  = points.len();
+    let n = points.len();
     prob.constraints.push(constraint!(xs[0] == points[0][0]));
     prob.constraints.push(constraint!(ys[0] == points[0][1]));
-    prob.constraints.push(constraint!(xs[n - 1] == points[n - 1][0]));
-    prob.constraints.push(constraint!(ys[n - 1] == points[n - 1][1]));
+    prob.constraints
+        .push(constraint!(xs[n - 1] == points[n - 1][0]));
+    prob.constraints
+        .push(constraint!(ys[n - 1] == points[n - 1][1]));
 
-     let mut solver = OSQPSolver::default();
+    let mut solver = OSQPSolver::default();
     solver.settings = solver.settings.verbose(false);
-    
+
     let solver = ClarabelSolver::default();
-    
+
     let solution = prob.solve(&solver).unwrap();
     solution
         .eval_vec(xs)

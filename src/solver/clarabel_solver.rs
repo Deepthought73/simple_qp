@@ -65,11 +65,6 @@ impl Solver for ClarabelSolver {
             NonnegativeConeT(inequality_count),
         ];
 
-        println!("{:?}", constraint_matrix.m);
-        println!("{:?}", constraint_matrix.n);
-        println!("{}", b.len());
-        println!("{:?}", cones);
-
         let mut solver = clarabel::solver::DefaultSolver::new(
             &quadratic_objective,
             &linear_objective,
