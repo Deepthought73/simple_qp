@@ -1,0 +1,9 @@
+[package]
+name = "simple_qp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+osqp = "0.6.2"
+maplit = "1.0.2"
+clarabel = "0.9.0"
