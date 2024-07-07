@@ -22,10 +22,7 @@ impl<T: Into<Float>> ops::Div<T> for AffineExpression {
     type Output = AffineExpression;
 
     fn div(mut self, rhs: T) -> Self::Output {
-        let rhs = rhs.into();
-        for (_, factor) in self.variables.iter_mut() {
-            *factor /= rhs;
-        }
+        self /= rhs;
         self
     }
 }
@@ -33,7 +30,31 @@ impl<T: Into<Float>> ops::Div<T> for AffineExpression {
 impl<T: Into<Float>> ops::Div<T> for QuadraticExpression {
     type Output = QuadraticExpression;
 
-    fn div(self, rhs: T) -> Self::Output {
-        self * (1.0 / rhs.into())
+    fn div(mut self, rhs: T) -> Self::Output {
+        self /= rhs;
+        self
+    }
+}
+
+//
+// DivAssign
+//
+
+impl<T: Into<Float>> ops::DivAssign<T> for AffineExpression {
+    fn div_assign(&mut self, rhs: T) {
+        let rhs = rhs.into();
+        for (_, factor) in self.variables.iter_mut() {
+            *factor /= rhs;
+        }
+    }
+}
+
+impl<T: Into<Float>> ops::DivAssign<T> for QuadraticExpression {
+    fn div_assign(&mut self, rhs: T) {
+        let rhs = rhs.into();
+        for (_, factor) in self.quadratic_terms.iter_mut() {
+            *factor /= rhs;
+        }
+        self.linear_expression /= rhs;
     }
 }

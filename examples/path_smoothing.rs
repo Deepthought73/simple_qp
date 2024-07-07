@@ -1,6 +1,5 @@
 use plotpy::{Curve, Plot};
 use rand::{thread_rng, Rng};
-
 use simple_qp::problem::Problem;
 use simple_qp::solver::clarabel_solver::ClarabelSolver;
 use simple_qp::solver::osqp_solver::OSQPSolver;
@@ -13,7 +12,7 @@ fn smooth_path(points: Vec<[Float; 2]>, max_deviation: Float) -> Vec<[Float; 2]>
 
     for coords in [&xs, &ys] {
         for x in coords.windows(3) {
-            prob.objective = prob.objective + (x[2] - 2.0 * x[1] + x[0]).square();
+            prob.objective += (x[2] - 2.0 * x[1] + x[0]).square();
         }
     }
 

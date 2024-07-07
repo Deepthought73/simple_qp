@@ -32,15 +32,7 @@ impl<T: Into<AffineExpression>> ops::Add<T> for AffineExpression {
     type Output = AffineExpression;
 
     fn add(mut self, rhs: T) -> Self::Output {
-        let rhs = rhs.into();
-        for (var, factor) in rhs.variables {
-            if let Some(f) = self.variables.get_mut(&var) {
-                *f += factor;
-            } else {
-                self.variables.insert(var, factor);
-            }
-        }
-        self.constant += rhs.constant;
+        self += rhs.into();
         self
     }
 }
@@ -49,15 +41,7 @@ impl<T: Into<QuadraticExpression>> ops::Add<T> for QuadraticExpression {
     type Output = QuadraticExpression;
 
     fn add(mut self, rhs: T) -> Self::Output {
-        let rhs = rhs.into();
-        for (key, factor) in rhs.quadratic_terms {
-            if let Some(f) = self.quadratic_terms.get_mut(&key) {
-                *f += factor;
-            } else {
-                self.quadratic_terms.insert(key, factor);
-            }
-        }
-        self.linear_expression = self.linear_expression + rhs.linear_expression;
+        self += rhs.into();
         self
     }
 }
@@ -111,5 +95,37 @@ impl ops::Add<QuadraticExpression> for i32 {
 
     fn add(self, rhs: QuadraticExpression) -> Self::Output {
         rhs + self
+    }
+}
+
+//
+// AddAssign
+//
+
+impl<T: Into<AffineExpression>> ops::AddAssign<T> for AffineExpression {
+    fn add_assign(&mut self, rhs: T) {
+        let rhs = rhs.into();
+        for (var, factor) in rhs.variables {
+            if let Some(f) = self.variables.get_mut(&var) {
+                *f += factor;
+            } else {
+                self.variables.insert(var, factor);
+            }
+        }
+        self.constant += rhs.constant;
+    }
+}
+
+impl<T: Into<QuadraticExpression>> ops::AddAssign<T> for QuadraticExpression {
+    fn add_assign(&mut self, rhs: T) {
+        let rhs = rhs.into();
+        for (key, factor) in rhs.quadratic_terms {
+            if let Some(f) = self.quadratic_terms.get_mut(&key) {
+                *f += factor;
+            } else {
+                self.quadratic_terms.insert(key, factor);
+            }
+        }
+        self.linear_expression += rhs.linear_expression;
     }
 }

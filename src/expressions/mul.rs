@@ -22,11 +22,7 @@ impl<T: Into<Float>> ops::Mul<T> for AffineExpression {
     type Output = AffineExpression;
 
     fn mul(mut self, rhs: T) -> Self::Output {
-        let rhs = rhs.into();
-        for (_, factor) in self.variables.iter_mut() {
-            *factor *= rhs;
-        }
-        self.constant *= rhs;
+        self *= rhs;
         self
     }
 }
@@ -71,7 +67,7 @@ impl ops::Mul<AffineExpression> for AffineExpression {
         let mut ret = QuadraticExpression::default();
         for (k1, f1) in self.variables.iter() {
             for (k2, f2) in rhs.variables.iter() {
-                ret = ret + *f1 * *f2 * Variable(*k1) * Variable(*k2);
+                ret += *f1 * *f2 * Variable(*k1) * Variable(*k2);
             }
         }
         ret.linear_expression = rhs.clone() * self.constant
@@ -85,11 +81,7 @@ impl<T: Into<Float>> ops::Mul<T> for QuadraticExpression {
     type Output = QuadraticExpression;
 
     fn mul(mut self, rhs: T) -> Self::Output {
-        let rhs = rhs.into();
-        self.linear_expression = self.linear_expression * rhs;
-        for (_, factor) in self.quadratic_terms.iter_mut() {
-            *factor *= rhs;
-        }
+        self *= rhs;
         self
     }
 }
@@ -143,5 +135,29 @@ impl ops::Mul<QuadraticExpression> for i32 {
 
     fn mul(self, rhs: QuadraticExpression) -> Self::Output {
         rhs * self
+    }
+}
+
+//
+// MulAssign
+//
+
+impl<T: Into<Float>> ops::MulAssign<T> for AffineExpression {
+    fn mul_assign(&mut self, rhs: T) {
+        let rhs = rhs.into();
+        for (_, factor) in self.variables.iter_mut() {
+            *factor *= rhs;
+        }
+        self.constant *= rhs;
+    }
+}
+
+impl<T: Into<Float>> ops::MulAssign<T> for QuadraticExpression {
+    fn mul_assign(&mut self, rhs: T) {
+        let rhs = rhs.into();
+        for (_, factor) in self.quadratic_terms.iter_mut() {
+            *factor *= rhs;
+        }
+        self.linear_expression *= rhs;
     }
 }

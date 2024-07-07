@@ -95,3 +95,19 @@ impl ops::Sub<QuadraticExpression> for i32 {
         -rhs + self
     }
 }
+
+//
+// SubAssign
+//
+
+impl<T: Into<AffineExpression>> ops::SubAssign<T> for AffineExpression {
+    fn sub_assign(&mut self, rhs: T) {
+        *self += -rhs.into();
+    }
+}
+
+impl<T: Into<QuadraticExpression>> ops::SubAssign<T> for QuadraticExpression {
+    fn sub_assign(&mut self, rhs: T) {
+        *self += -rhs.into();
+    }
+}
