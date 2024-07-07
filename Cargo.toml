@@ -1,6 +1,11 @@
 [package]
 name = "simple_qp"
 version = "0.1.0"
+license = "MIT"
+description = "Allows formulating Quadratic Programming problems in a symbolic way."
+homepage = "https://github.com/Deepthought73/simple_qp"
+repository = "https://github.com/Deepthought73/simple_qp"
+readme = "README.md"
 edition = "2021"
 
 [dependencies]
