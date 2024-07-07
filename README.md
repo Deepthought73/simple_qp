@@ -1,6 +1,6 @@
 # simple_qp
 
-[![Rust](https://github.com/Deepthought73/simple_qp/workflows/Rust/badge.svg)](https://github.com/FlorianNAdam/iprint-rs/actions)
+[![Rust](https://github.com/Deepthought73/simple_qp/workflows/Rust/badge.svg)](https://github.com/Deepthought73/simple_qp/actions)
 
 `simple_qp` allows formulating *Quadratic Programming (QP)* problems in a symbolic way.
 Define your QP without unreadable matrix initializations.
