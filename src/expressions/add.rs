@@ -1,8 +1,9 @@
+use std::ops;
+
 use crate::expressions::affine_expression::AffineExpression;
 use crate::expressions::quadratic_expression::QuadraticExpression;
 use crate::expressions::variable::Variable;
 use crate::Float;
-use std::ops;
 
 impl<T: Into<AffineExpression>> ops::Add<T> for Variable {
     type Output = AffineExpression;
@@ -105,11 +106,11 @@ impl ops::Add<QuadraticExpression> for i32 {
 impl<T: Into<AffineExpression>> ops::AddAssign<T> for AffineExpression {
     fn add_assign(&mut self, rhs: T) {
         let rhs = rhs.into();
-        for (var, factor) in rhs.variables {
-            if let Some(f) = self.variables.get_mut(&var) {
+        for (var, factor) in rhs.linear_expression {
+            if let Some(f) = self.linear_expression.get_mut(&var) {
                 *f += factor;
             } else {
-                self.variables.insert(var, factor);
+                self.linear_expression.insert(var, factor);
             }
         }
         self.constant += rhs.constant;
@@ -119,13 +120,13 @@ impl<T: Into<AffineExpression>> ops::AddAssign<T> for AffineExpression {
 impl<T: Into<QuadraticExpression>> ops::AddAssign<T> for QuadraticExpression {
     fn add_assign(&mut self, rhs: T) {
         let rhs = rhs.into();
-        for (key, factor) in rhs.quadratic_terms {
-            if let Some(f) = self.quadratic_terms.get_mut(&key) {
+        for (key, factor) in rhs.quadratic_expression {
+            if let Some(f) = self.quadratic_expression.get_mut(&key) {
                 *f += factor;
             } else {
-                self.quadratic_terms.insert(key, factor);
+                self.quadratic_expression.insert(key, factor);
             }
         }
-        self.linear_expression += rhs.linear_expression;
+        self.affine_expression += rhs.affine_expression;
     }
 }

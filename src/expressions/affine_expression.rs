@@ -2,14 +2,15 @@ use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::ops;
 
+use maplit::hashmap;
+
 use crate::expressions::quadratic_expression::QuadraticExpression;
 use crate::expressions::variable::Variable;
 use crate::Float;
-use maplit::hashmap;
 
 #[derive(Clone, Debug, Default)]
 pub struct AffineExpression {
-    pub variables: HashMap<usize, Float>,
+    pub linear_expression: HashMap<usize, Float>,
     pub constant: Float,
 }
 
@@ -21,7 +22,7 @@ impl AffineExpression {
 
 impl Display for AffineExpression {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        for (k, factor) in self.variables.iter() {
+        for (k, factor) in self.linear_expression.iter() {
             if *factor == 1.0 {
                 write!(f, "({}) + ", k)?;
             } else if *factor == -1.0 {
@@ -40,7 +41,7 @@ impl ops::Neg for AffineExpression {
     type Output = AffineExpression;
 
     fn neg(mut self) -> Self::Output {
-        for (_, factors) in self.variables.iter_mut() {
+        for (_, factors) in self.linear_expression.iter_mut() {
             *factors = -*factors;
         }
         self.constant = -self.constant;
@@ -51,7 +52,7 @@ impl ops::Neg for AffineExpression {
 impl<T: Into<Float>> From<T> for AffineExpression {
     fn from(value: T) -> Self {
         AffineExpression {
-            variables: Default::default(),
+            linear_expression: Default::default(),
             constant: value.into(),
         }
     }
@@ -60,7 +61,7 @@ impl<T: Into<Float>> From<T> for AffineExpression {
 impl From<Variable> for AffineExpression {
     fn from(value: Variable) -> Self {
         AffineExpression {
-            variables: hashmap! { value.0 => 1.0 },
+            linear_expression: hashmap! { value.0 => 1.0 },
             constant: 0.0,
         }
     }

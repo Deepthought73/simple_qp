@@ -1,13 +1,8 @@
-use crate::problem::Problem;
-use crate::solver::util::{convert_csc_to_osqp_csc_matrix, CscMatrixBuilder};
-use crate::solver::{SolvedProblem, Solver, SolverStatus};
-use crate::Float;
-
 #[derive(Default)]
 pub struct OSQPSolver {
     pub settings: osqp::Settings,
 }
-
+/*
 impl Solver for OSQPSolver {
     fn solve(&self, problem: Problem) -> Result<SolvedProblem, SolverStatus> {
         let quadratic_objective = convert_csc_to_osqp_csc_matrix(problem.objective_to_csc_matrix());
@@ -67,3 +62,4 @@ impl Solver for OSQPSolver {
         }
     }
 }
+*/

@@ -1,16 +1,18 @@
+use std::ops;
+
+use maplit::hashmap;
+
 use crate::expressions::affine_expression::AffineExpression;
 use crate::expressions::quadratic_expression::QuadraticExpression;
 use crate::expressions::variable::Variable;
 use crate::Float;
-use maplit::hashmap;
-use std::ops;
 
 impl<T: Into<Float>> ops::Mul<T> for Variable {
     type Output = AffineExpression;
 
     fn mul(self, factor: T) -> Self::Output {
         AffineExpression {
-            variables: hashmap! {
+            linear_expression: hashmap! {
                 self.0 => factor.into()
             },
             constant: 0.0,
@@ -32,10 +34,10 @@ impl ops::Mul<Variable> for Variable {
 
     fn mul(self, rhs: Variable) -> Self::Output {
         QuadraticExpression {
-            quadratic_terms: hashmap! {
+            quadratic_expression: hashmap! {
                 [self.0.min(rhs.0), self.0.max(rhs.0)] => 1.0
             },
-            linear_expression: Default::default(),
+            affine_expression: Default::default(),
         }
     }
 }
@@ -45,13 +47,13 @@ impl ops::Mul<Variable> for AffineExpression {
 
     fn mul(self, rhs: Variable) -> Self::Output {
         QuadraticExpression {
-            quadratic_terms: self
-                .variables
+            quadratic_expression: self
+                .linear_expression
                 .into_iter()
                 .map(|(k, f)| ([k.min(rhs.0), k.max(rhs.0)], f))
                 .collect(),
-            linear_expression: AffineExpression {
-                variables: hashmap! {
+            affine_expression: AffineExpression {
+                linear_expression: hashmap! {
                     rhs.0 => self.constant
                 },
                 constant: 0.0,
@@ -65,12 +67,12 @@ impl ops::Mul<AffineExpression> for AffineExpression {
 
     fn mul(self, rhs: AffineExpression) -> Self::Output {
         let mut ret = QuadraticExpression::default();
-        for (k1, f1) in self.variables.iter() {
-            for (k2, f2) in rhs.variables.iter() {
+        for (k1, f1) in self.linear_expression.iter() {
+            for (k2, f2) in rhs.linear_expression.iter() {
                 ret += *f1 * *f2 * Variable(*k1) * Variable(*k2);
             }
         }
-        ret.linear_expression = rhs.clone() * self.constant
+        ret.affine_expression = rhs.clone() * self.constant
             + self.clone() * rhs.constant
             + self.constant * rhs.constant;
         ret
@@ -145,7 +147,7 @@ impl ops::Mul<QuadraticExpression> for i32 {
 impl<T: Into<Float>> ops::MulAssign<T> for AffineExpression {
     fn mul_assign(&mut self, rhs: T) {
         let rhs = rhs.into();
-        for (_, factor) in self.variables.iter_mut() {
+        for (_, factor) in self.linear_expression.iter_mut() {
             *factor *= rhs;
         }
         self.constant *= rhs;
@@ -155,9 +157,9 @@ impl<T: Into<Float>> ops::MulAssign<T> for AffineExpression {
 impl<T: Into<Float>> ops::MulAssign<T> for QuadraticExpression {
     fn mul_assign(&mut self, rhs: T) {
         let rhs = rhs.into();
-        for (_, factor) in self.quadratic_terms.iter_mut() {
+        for (_, factor) in self.quadratic_expression.iter_mut() {
             *factor *= rhs;
         }
-        self.linear_expression *= rhs;
+        self.affine_expression *= rhs;
     }
 }
