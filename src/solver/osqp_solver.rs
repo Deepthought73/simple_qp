@@ -2,10 +2,10 @@ use osqp::Status;
 
 use crate::constraint::Constraint;
 use crate::expressions::quadratic_expression::QuadraticExpression;
-use crate::problem_variables::ProblemVariables;
-use crate::solver::util::{convert_csc_to_osqp_csc_matrix, CscMatrixBuilder};
-use crate::solver::{SolvedProblem, Solver, SolverStatus};
 use crate::Float;
+use crate::problem_variables::ProblemVariables;
+use crate::solver::{SolvedProblem, Solver, SolverStatus};
+use crate::util::{convert_csc_to_osqp_csc_matrix, CscMatrixTripletsBuilder};
 
 #[derive(Default)]
 pub struct OSQPSolver {
@@ -26,7 +26,7 @@ impl Solver for OSQPSolver {
         let quadratic_objective = convert_csc_to_osqp_csc_matrix(quadratic_objective);
         let linear_objective = objective.linear_as_vector(problem.bounds.len());
 
-        let mut constraint_matrix = CscMatrixBuilder::new(
+        let mut constraint_matrix = CscMatrixTripletsBuilder::new(
             constraints.len() + problem.variable_bound_count(),
             problem.bounds.len(),
         );

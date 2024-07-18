@@ -6,8 +6,8 @@ use clarabel::algebra::CscMatrix;
 
 use crate::expressions::affine_expression::AffineExpression;
 use crate::expressions::variable::Variable;
-use crate::solver::util::CscMatrixBuilder;
 use crate::Float;
+use crate::util::CscMatrixTripletsBuilder;
 
 #[derive(Clone, Debug, Default)]
 pub struct QuadraticExpression {
@@ -21,7 +21,7 @@ impl QuadraticExpression {
             return CscMatrix::zeros((variable_count, variable_count));
         }
 
-        let mut quadratic_objective = CscMatrixBuilder::new(variable_count, variable_count);
+        let mut quadratic_objective = CscMatrixTripletsBuilder::new(variable_count, variable_count);
 
         for (k, &factor) in self.quadratic_expression.iter() {
             if k[0] != k[1] {

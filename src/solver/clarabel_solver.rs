@@ -1,12 +1,12 @@
-use clarabel::solver::SolverStatus::{DualInfeasible, PrimalInfeasible, Solved};
 use clarabel::solver::{DefaultSettings, IPSolver, NonnegativeConeT, ZeroConeT};
+use clarabel::solver::SolverStatus::{DualInfeasible, PrimalInfeasible, Solved};
 
 use crate::constraint::Constraint;
 use crate::expressions::quadratic_expression::QuadraticExpression;
-use crate::problem_variables::ProblemVariables;
-use crate::solver::util::CscMatrixBuilder;
-use crate::solver::{SolvedProblem, Solver, SolverStatus};
 use crate::Float;
+use crate::problem_variables::ProblemVariables;
+use crate::solver::{SolvedProblem, Solver, SolverStatus};
+use crate::util::CscMatrixTripletsBuilder;
 
 #[derive(Default)]
 pub struct ClarabelSolver {
@@ -26,7 +26,8 @@ impl Solver for ClarabelSolver {
         let quadratic_objective = objective.quadratic_as_csc(problem.bounds.len());
         let linear_objective = objective.linear_as_vector(problem.bounds.len());
 
-        let mut constraint_matrix = CscMatrixBuilder::new(constraints.len(), problem.bounds.len());
+        let mut constraint_matrix =
+            CscMatrixTripletsBuilder::new(constraints.len(), problem.bounds.len());
         let mut b = vec![];
 
         let mut row = 0;

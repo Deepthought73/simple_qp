@@ -66,10 +66,18 @@ impl ops::Mul<AffineExpression> for AffineExpression {
     type Output = QuadraticExpression;
 
     fn mul(self, rhs: AffineExpression) -> Self::Output {
+        self * &rhs
+    }
+}
+
+impl ops::Mul<&AffineExpression> for AffineExpression {
+    type Output = QuadraticExpression;
+
+    fn mul(self, rhs: &AffineExpression) -> Self::Output {
         let mut ret = QuadraticExpression::default();
-        for (k1, f1) in self.linear_expression.iter() {
-            for (k2, f2) in rhs.linear_expression.iter() {
-                ret += *f1 * *f2 * Variable(*k1) * Variable(*k2);
+        for (&k1, &f1) in self.linear_expression.iter() {
+            for (&k2, &f2) in rhs.linear_expression.iter() {
+                ret += f1 * f2 * Variable(k1) * Variable(k2);
             }
         }
         ret.affine_expression = rhs.clone() * self.constant

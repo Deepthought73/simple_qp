@@ -3,7 +3,7 @@ use clarabel::algebra::CscMatrix;
 use crate::Float;
 
 #[derive(Default)]
-pub struct CscMatrixBuilder {
+pub struct CscMatrixTripletsBuilder {
     row_count: usize,
     col_count: usize,
     row: Vec<usize>,
@@ -11,7 +11,7 @@ pub struct CscMatrixBuilder {
     vals: Vec<Float>,
 }
 
-impl CscMatrixBuilder {
+impl CscMatrixTripletsBuilder {
     pub fn new(row_count: usize, col_count: usize) -> Self {
         Self {
             row_count,

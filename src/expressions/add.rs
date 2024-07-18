@@ -9,7 +9,7 @@ impl<T: Into<AffineExpression>> ops::Add<T> for Variable {
     type Output = AffineExpression;
 
     fn add(self, rhs: T) -> Self::Output {
-        AffineExpression::from(self) + rhs
+        rhs.into() + self
     }
 }
 
@@ -29,11 +29,29 @@ impl ops::Add<QuadraticExpression> for AffineExpression {
     }
 }
 
+impl ops::Add<&AffineExpression> for AffineExpression {
+    type Output = AffineExpression;
+
+    fn add(mut self, rhs: &AffineExpression) -> Self::Output {
+        self += rhs;
+        self
+    }
+}
+
 impl<T: Into<AffineExpression>> ops::Add<T> for AffineExpression {
     type Output = AffineExpression;
 
     fn add(mut self, rhs: T) -> Self::Output {
         self += rhs.into();
+        self
+    }
+}
+
+impl ops::Add<&QuadraticExpression> for QuadraticExpression {
+    type Output = QuadraticExpression;
+
+    fn add(mut self, rhs: &QuadraticExpression) -> Self::Output {
+        self += rhs;
         self
     }
 }
@@ -103,30 +121,40 @@ impl ops::Add<QuadraticExpression> for i32 {
 // AddAssign
 //
 
-impl<T: Into<AffineExpression>> ops::AddAssign<T> for AffineExpression {
-    fn add_assign(&mut self, rhs: T) {
-        let rhs = rhs.into();
-        for (var, factor) in rhs.linear_expression {
-            if let Some(f) = self.linear_expression.get_mut(&var) {
+impl ops::AddAssign<&AffineExpression> for AffineExpression {
+    fn add_assign(&mut self, rhs: &AffineExpression) {
+        for (var, factor) in rhs.linear_expression.iter() {
+            if let Some(f) = self.linear_expression.get_mut(var) {
                 *f += factor;
             } else {
-                self.linear_expression.insert(var, factor);
+                self.linear_expression.insert(*var, *factor);
             }
         }
         self.constant += rhs.constant;
     }
 }
 
-impl<T: Into<QuadraticExpression>> ops::AddAssign<T> for QuadraticExpression {
+impl<T: Into<AffineExpression>> ops::AddAssign<T> for AffineExpression {
     fn add_assign(&mut self, rhs: T) {
-        let rhs = rhs.into();
-        for (key, factor) in rhs.quadratic_expression {
-            if let Some(f) = self.quadratic_expression.get_mut(&key) {
+        *self += &rhs.into();
+    }
+}
+
+impl ops::AddAssign<&QuadraticExpression> for QuadraticExpression {
+    fn add_assign(&mut self, rhs: &QuadraticExpression) {
+        for (key, factor) in rhs.quadratic_expression.iter() {
+            if let Some(f) = self.quadratic_expression.get_mut(key) {
                 *f += factor;
             } else {
-                self.quadratic_expression.insert(key, factor);
+                self.quadratic_expression.insert(*key, *factor);
             }
         }
-        self.affine_expression += rhs.affine_expression;
+        self.affine_expression += &rhs.affine_expression;
+    }
+}
+
+impl<T: Into<QuadraticExpression>> ops::AddAssign<T> for QuadraticExpression {
+    fn add_assign(&mut self, rhs: T) {
+        *self += &rhs.into();
     }
 }

@@ -1,12 +1,11 @@
 use crate::constraint::Constraint;
 use crate::expressions::variable::Variable;
-use crate::problem_variables::ProblemVariables;
 use crate::Float;
+use crate::problem_variables::ProblemVariables;
 
 pub mod clarabel_solver;
 pub mod coin_cbc_solver;
 pub mod osqp_solver;
-pub mod util;
 
 #[derive(Copy, Clone, Debug)]
 pub enum SolverStatus {
