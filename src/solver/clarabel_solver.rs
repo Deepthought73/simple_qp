@@ -1,11 +1,12 @@
+use clarabel::solver::SolverStatus::{DualInfeasible, PrimalInfeasible, Solved};
 use clarabel::solver::{DefaultSettings, IPSolver, NonnegativeConeT, ZeroConeT};
 
 use crate::constraint::Constraint;
 use crate::expressions::quadratic_expression::QuadraticExpression;
-use crate::Float;
 use crate::problem_variables::ProblemVariables;
-use crate::solver::{SolvedProblem, Solver};
 use crate::solver::util::CscMatrixBuilder;
+use crate::solver::{SolvedProblem, Solver, SolverStatus};
+use crate::Float;
 
 #[derive(Default)]
 pub struct ClarabelSolver {
@@ -14,14 +15,13 @@ pub struct ClarabelSolver {
 
 impl Solver for ClarabelSolver {
     type ObjectiveType = QuadraticExpression;
-    type SolverStatus = clarabel::solver::SolverStatus;
 
     fn solve<O: Into<Self::ObjectiveType>>(
         &self,
         problem: ProblemVariables,
         objective: O,
         constraints: Vec<Constraint>,
-    ) -> Result<SolvedProblem, Self::SolverStatus> {
+    ) -> Result<SolvedProblem, SolverStatus> {
         let objective = objective.into();
         let quadratic_objective = objective.quadratic_as_csc(problem.bounds.len());
         let linear_objective = objective.linear_as_vector(problem.bounds.len());
@@ -102,12 +102,12 @@ impl Solver for ClarabelSolver {
         );
         solver.solve();
 
-        if solver.solution.status == clarabel::solver::SolverStatus::Solved {
-            Ok(SolvedProblem {
+        match solver.solution.status {
+            Solved => Ok(SolvedProblem {
                 x: solver.solution.x,
-            })
-        } else {
-            Err(solver.solution.status)
+            }),
+            PrimalInfeasible | DualInfeasible => Err(SolverStatus::Infeasible),
+            _ => Err(SolverStatus::OtherError),
         }
     }
 }

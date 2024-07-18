@@ -1,41 +1,38 @@
 use plotpy::{Curve, Plot};
-use rand::{Rng, thread_rng};
+use rand::{thread_rng, Rng};
 
-use simple_qp::{constraint, Float};
+use simple_qp::expressions::quadratic_expression::QuadraticExpression;
 use simple_qp::problem_variables::ProblemVariables;
 use simple_qp::solver::clarabel_solver::ClarabelSolver;
+use simple_qp::solver::Solver;
+use simple_qp::{constraint, Float};
 
 fn smooth_path(points: Vec<[Float; 2]>, max_deviation: Float) -> Vec<[Float; 2]> {
     let mut prob = ProblemVariables::default();
-    let xs = prob.add_vec(points.len(), None, None, false);
-    let ys = prob.add_vec(points.len(), None, None, false);
+    let xs = prob.add_vector(points.len(), None, None);
+    let ys = prob.add_vector(points.len(), None, None);
 
+    let mut objective = QuadraticExpression::default();
     for coords in [&xs, &ys] {
         for x in coords.windows(3) {
-            prob.objective += (x[2].clone() - 2.0 * x[1].clone() + &x[0]).square();
+            objective += (x[2] - 2.0 * x[1] + x[0]).square();
         }
     }
 
+    let mut constraints = vec![];
     for (i, p) in points.iter().enumerate() {
-        prob.constraints
-            .push(constraint!(-max_deviation <= xs[i].clone() - p[0] <= max_deviation));
-        prob.constraints
-            .push(constraint!(-max_deviation <= ys[i].clone() - p[1] <= max_deviation));
+        constraints.push(constraint!(-max_deviation <= xs[i].clone() - p[0] <= max_deviation));
+        constraints.push(constraint!(-max_deviation <= ys[i].clone() - p[1] <= max_deviation));
     }
 
     let n = points.len();
-    prob.constraints
-        .push(constraint!(xs[0].clone() == points[0][0]));
-    prob.constraints
-        .push(constraint!(ys[0].clone() == points[0][1]));
-    prob.constraints
-        .push(constraint!(xs[n - 1].clone() == points[n - 1][0]));
-    prob.constraints
-        .push(constraint!(ys[n - 1].clone() == points[n - 1][1]));
+    constraints.push(constraint!(xs[0].clone() == points[0][0]));
+    constraints.push(constraint!(ys[0].clone() == points[0][1]));
+    constraints.push(constraint!(xs[n - 1].clone() == points[n - 1][0]));
+    constraints.push(constraint!(ys[n - 1].clone() == points[n - 1][1]));
 
     let solver = ClarabelSolver::default();
-
-    let solution = prob.solve(&solver).unwrap();
+    let solution = solver.solve(prob, objective, constraints).unwrap();
     solution
         .eval_vec(&xs)
         .into_iter()

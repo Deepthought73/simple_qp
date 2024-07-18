@@ -1,21 +1,20 @@
 use crate::constraint::Constraint;
 use crate::expressions::affine_expression::AffineExpression;
 use crate::problem_variables::ProblemVariables;
-use crate::solver::{SolvedProblem, Solver};
+use crate::solver::{SolvedProblem, Solver, SolverStatus};
 
 #[derive(Default)]
 pub struct CoinCbcSolver;
 
 impl Solver for CoinCbcSolver {
     type ObjectiveType = AffineExpression;
-    type SolverStatus = coin_cbc::raw::Status;
 
     fn solve<O: Into<Self::ObjectiveType>>(
         &self,
         problem: ProblemVariables,
         objective: O,
         constraints: Vec<Constraint>,
-    ) -> Result<SolvedProblem, Self::SolverStatus> {
+    ) -> Result<SolvedProblem, SolverStatus> {
         let mut model = coin_cbc::Model::default();
 
         let x = problem
@@ -69,15 +68,17 @@ impl Solver for CoinCbcSolver {
         let status = sol.raw().status();
         if status == coin_cbc::raw::Status::Finished || status == coin_cbc::raw::Status::Unlaunched
         {
-            if sol.raw().is_continuous_unbounded() || sol.raw().is_proven_infeasible() {
-                Err(status)
+            if sol.raw().is_proven_infeasible() {
+                Err(SolverStatus::Infeasible)
+            } else if sol.raw().is_continuous_unbounded() {
+                Err(SolverStatus::Unbounded)
             } else {
                 Ok(SolvedProblem {
                     x: x.into_iter().map(|c| sol.col(c)).collect(),
                 })
             }
         } else {
-            Err(status)
+            Err(SolverStatus::OtherError)
         }
     }
 }

@@ -7,15 +7,14 @@ fn main() {
     let mut problem = ProblemVariables::default();
     let x = problem.add_variable(None, Some(1.0));
     let y = problem.add_variable(None, None);
-    let z = problem.add_variable(None, None);
+    let z_neg = problem.add_variable(None, None);
+    let z_pos = problem.add_variable(None, None);
 
-    let objective = z;
+    let objective = z_neg + z_pos;
 
-    let mut constraints = vec![];
-    constraints.push(constraint!(y >= 2));
-    constraints.push(constraint!(x + z == y));
+    let constraints = vec![constraint!(y >= 2), constraint!(x - y == z_pos - z_neg)];
 
-    let solver = CoinCbcSolver::default();
+    let solver = CoinCbcSolver;
     let result = solver
         .solve(problem, objective, constraints)
         .expect("Solver error");

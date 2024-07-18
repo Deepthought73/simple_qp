@@ -1,20 +1,21 @@
 use simple_qp::constraint;
 use simple_qp::problem_variables::ProblemVariables;
-use simple_qp::solver::clarabel_solver::ClarabelSolver;
+use simple_qp::solver::osqp_solver::OSQPSolver;
 use simple_qp::solver::Solver;
 
 fn main() {
     let mut problem = ProblemVariables::default();
-    let x = problem.add_variable(None, None);
-    let y = problem.add_variable(None, None);
+    let x = problem.add_variable(Some(85.), None);
+    let y = problem.add_variable(Some(4.0), None);
 
     let objective = (x - 42).square() + (y - 73).square() + (x - y).square();
 
-    let mut constraints = vec![];
-    constraints.push(constraint!(50 <= 1.5 * (x / 3 + 2 * y) <= 100));
-    constraints.push(constraint!(x - y == 75 + 2 * y));
+    let constraints = vec![
+        constraint!(50 <= 1.5 * (x / 3 + 2 * y) <= 100),
+        constraint!(x - y == 75 + 2 * y),
+    ];
 
-    let solver = ClarabelSolver::default();
+    let solver = OSQPSolver::default();
     let res = solver
         .solve(problem, objective, constraints)
         .expect("Solver error");

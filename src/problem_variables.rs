@@ -23,4 +23,11 @@ impl ProblemVariables {
             .map(|_| self.add_variable(lower, upper))
             .collect::<Vec<_>>()
     }
+
+    pub fn variable_bound_count(&self) -> usize {
+        self.bounds
+            .iter()
+            .filter(|it| it.0.is_some() || it.1.is_some())
+            .count()
+    }
 }

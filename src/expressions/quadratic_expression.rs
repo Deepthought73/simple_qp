@@ -6,8 +6,8 @@ use clarabel::algebra::CscMatrix;
 
 use crate::expressions::affine_expression::AffineExpression;
 use crate::expressions::variable::Variable;
-use crate::Float;
 use crate::solver::util::CscMatrixBuilder;
+use crate::Float;
 
 #[derive(Clone, Debug, Default)]
 pub struct QuadraticExpression {
