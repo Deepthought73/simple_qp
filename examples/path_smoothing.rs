@@ -7,7 +7,7 @@ use simple_qp::solver::clarabel_solver::ClarabelSolver;
 use simple_qp::solver::Solver;
 use simple_qp::{constraint, Float};
 
-fn smooth_path(points: Vec<[Float; 2]>, max_deviation: Float) -> Vec<[Float; 2]> {
+fn smooth_path(points: &[[Float; 2]], max_deviation: Float) -> Vec<[Float; 2]> {
     let mut prob = ProblemVariables::default();
     let xs = prob.add_vector(points.len(), None, None);
     let ys = prob.add_vector(points.len(), None, None);
@@ -21,15 +21,15 @@ fn smooth_path(points: Vec<[Float; 2]>, max_deviation: Float) -> Vec<[Float; 2]>
 
     let mut constraints = vec![];
     for (i, p) in points.iter().enumerate() {
-        constraints.push(constraint!(-max_deviation <= xs[i].clone() - p[0] <= max_deviation));
-        constraints.push(constraint!(-max_deviation <= ys[i].clone() - p[1] <= max_deviation));
+        constraints.push(constraint!(-max_deviation <= xs[i] - p[0] <= max_deviation));
+        constraints.push(constraint!(-max_deviation <= ys[i] - p[1] <= max_deviation));
     }
 
     let n = points.len();
-    constraints.push(constraint!(xs[0].clone() == points[0][0]));
-    constraints.push(constraint!(ys[0].clone() == points[0][1]));
-    constraints.push(constraint!(xs[n - 1].clone() == points[n - 1][0]));
-    constraints.push(constraint!(ys[n - 1].clone() == points[n - 1][1]));
+    constraints.push(constraint!(xs[0] == points[0][0]));
+    constraints.push(constraint!(ys[0] == points[0][1]));
+    constraints.push(constraint!(xs[n - 1] == points[n - 1][0]));
+    constraints.push(constraint!(ys[n - 1] == points[n - 1][1]));
 
     let solver = ClarabelSolver::default();
     let solution = solver.solve(prob, objective, constraints).unwrap();
@@ -64,7 +64,7 @@ fn path_xy(path: &[[Float; 2]]) -> (Vec<Float>, Vec<Float>) {
 fn main() {
     //let original = vec![[0.0, 0.0], [1.0, 1.0], [2.0, 2.0], [3.0, 1.0], [4.0, 0.0]];
     let original = random_path(300);
-    let smooth = smooth_path(original.clone(), 0.5);
+    let smooth = smooth_path(&original, 0.5);
 
     let mut plot = Plot::new();
     let mut c = Curve::new();

@@ -1,12 +1,12 @@
-use clarabel::solver::{DefaultSettings, IPSolver, NonnegativeConeT, ZeroConeT};
 use clarabel::solver::SolverStatus::{DualInfeasible, PrimalInfeasible, Solved};
+use clarabel::solver::{DefaultSettings, IPSolver, NonnegativeConeT, ZeroConeT};
 
 use crate::constraint::Constraint;
 use crate::expressions::quadratic_expression::QuadraticExpression;
-use crate::Float;
 use crate::problem_variables::ProblemVariables;
 use crate::solver::{SolvedProblem, Solver, SolverStatus};
 use crate::util::CscMatrixTripletsBuilder;
+use crate::Float;
 
 #[derive(Default)]
 pub struct ClarabelSolver {

@@ -1,7 +1,7 @@
 use crate::constraint::Constraint;
 use crate::expressions::variable::Variable;
-use crate::Float;
 use crate::problem_variables::ProblemVariables;
+use crate::Float;
 
 pub mod clarabel_solver;
 pub mod coin_cbc_solver;
