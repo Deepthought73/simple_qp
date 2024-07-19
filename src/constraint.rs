@@ -2,41 +2,41 @@ use crate::expressions::affine_expression::AffineExpression;
 use crate::Float;
 
 #[derive(Clone, Debug)]
-pub struct Constraint {
-    pub expression: AffineExpression,
-    pub lower_bound: Option<Float>,
-    pub upper_bound: Option<Float>,
-    pub is_equality: bool,
+pub enum Constraint {
+    LinearInequality {
+        expression: AffineExpression,
+        lower_bound: Option<Float>,
+        upper_bound: Option<Float>,
+    },
+    LinearEquality {
+        expression: AffineExpression,
+    },
 }
 
 pub fn eq<A: Into<AffineExpression>, B: Into<AffineExpression>>(lhs: A, rhs: B) -> Constraint {
-    Constraint {
-        expression: lhs.into() - rhs,
-        lower_bound: None,
-        upper_bound: None,
-        is_equality: true,
-    }
+    let expression = lhs.into() - rhs;
+    Constraint::LinearEquality { expression }
 }
 
 pub fn leq<A: Into<AffineExpression>, B: Into<AffineExpression>>(lhs: A, rhs: B) -> Constraint {
-    Constraint {
-        expression: lhs.into() - rhs,
+    let expression = lhs.into() - rhs;
+    Constraint::LinearInequality {
+        expression,
         lower_bound: None,
         upper_bound: Some(0.0),
-        is_equality: false,
     }
 }
 
 pub fn leq_leq<A: Into<Float>, B: Into<AffineExpression>, C: Into<Float>>(
-    lhs: A,
-    middle: B,
-    rhs: C,
+    lower_bound: A,
+    expression: B,
+    upper_bound: C,
 ) -> Constraint {
-    Constraint {
-        expression: middle.into(),
-        lower_bound: Some(lhs.into()),
-        upper_bound: Some(rhs.into()),
-        is_equality: false,
+    let expression = expression.into();
+    Constraint::LinearInequality {
+        expression,
+        lower_bound: Some(lower_bound.into()),
+        upper_bound: Some(upper_bound.into()),
     }
 }
 
