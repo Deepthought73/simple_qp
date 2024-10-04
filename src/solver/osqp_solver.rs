@@ -1,10 +1,11 @@
+use clarabel::algebra::CscMatrix;
 use osqp::Status;
 
 use crate::constraint::Constraint;
 use crate::expressions::quadratic_expression::QuadraticExpression;
 use crate::problem_variables::ProblemVariables;
 use crate::solver::{SolvedProblem, Solver, SolverStatus};
-use crate::util::{convert_csc_to_osqp_csc_matrix, CscMatrixTripletsBuilder};
+use crate::util::CscMatrixTripletsBuilder;
 use crate::Float;
 
 #[derive(Default)]
@@ -99,5 +100,15 @@ impl Solver for OSQPSolver {
             | Status::DualInfeasibleInaccurate(_) => Err(SolverStatus::Infeasible),
             _ => Err(SolverStatus::OtherError),
         }
+    }
+}
+
+pub fn convert_csc_to_osqp_csc_matrix<'a>(csc_matrix: CscMatrix) -> osqp::CscMatrix<'a> {
+    osqp::CscMatrix {
+        nrows: csc_matrix.m,
+        ncols: csc_matrix.n,
+        indptr: csc_matrix.colptr.into(),
+        indices: csc_matrix.rowval.into(),
+        data: csc_matrix.nzval.into(),
     }
 }

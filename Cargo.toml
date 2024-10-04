@@ -8,14 +8,28 @@ repository = "https://github.com/Deepthought73/simple_qp"
 readme = "README.md"
 edition = "2021"
 
+[features]
+default = ["clarabel"]
+osqp = ["dep:osqp"]
+clarabel = ["dep:clarabel"]
+coin_cbc = ["dep:coin_cbc"]
+
 [dependencies]
-osqp = "0.6.2"
-clarabel = "0.9.0"
-coin_cbc = "0.1.8"
+osqp = { version = "0.6.2", optional = true }
+clarabel = { version = "0.9.0", optional = true }
+coin_cbc = { version = "0.1.8", optional = true }
 
 maplit = "1.0.2"
 array-init = "2.1.0"
 
 [dev-dependencies]
 rand = "0.8.5"
-plotpy = "1.0.0"
+plotpy = "1.10.1"
+
+[[example]]
+name = "lp_example"
+required-features = ["coin_cbc"]
+
+[[example]]
+name = "minimalistic_example"
+required-features = ["osqp"]

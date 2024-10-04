@@ -3,8 +3,11 @@ use crate::expressions::variable::Variable;
 use crate::problem_variables::ProblemVariables;
 use crate::Float;
 
+#[cfg(feature = "clarabel")]
 pub mod clarabel_solver;
+#[cfg(feature = "coin_cbc")]
 pub mod coin_cbc_solver;
+#[cfg(feature = "osqp")]
 pub mod osqp_solver;
 
 #[derive(Copy, Clone, Debug)]

@@ -143,13 +143,3 @@ impl SequentialHessianBuilder {
         }
     }
 }
-
-pub fn convert_csc_to_osqp_csc_matrix<'a>(csc_matrix: CscMatrix) -> osqp::CscMatrix<'a> {
-    osqp::CscMatrix {
-        nrows: csc_matrix.m,
-        ncols: csc_matrix.n,
-        indptr: csc_matrix.colptr.into(),
-        indices: csc_matrix.rowval.into(),
-        data: csc_matrix.nzval.into(),
-    }
-}

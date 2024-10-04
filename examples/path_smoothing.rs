@@ -76,5 +76,5 @@ fn main() {
     c.draw(&x, &y);
     plot.add(&c);
     plot.legend();
-    plot.save_and_show("/tmp/tmp.png").unwrap()
+    plot.show("/tmp/tmp.png").unwrap()
 }
